@@ -6,6 +6,9 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.linear_model import LinearRegression
 
 app = Flask(__name__)
+CORS(app)  # Permitir todas las solicitudes desde cualquier origen
+
+# Configuración específica
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/predict', methods=['GET'])
