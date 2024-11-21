@@ -68,17 +68,22 @@ def predict():
             valor_predicho_escalado = modelo.predict(X_escalado[i].reshape(1, -1))
             valor_predicho = escalador_y.inverse_transform(valor_predicho_escalado.reshape(-1, 1))[0][0]
 
-            resultados.append({
-                "name": data.index[i].strftime('%Y-%m-%d'),
-                "real": round(float(y[i]), 2),
-                "predicho": round(float(valor_predicho), 2)
-            })
+            # Convertir la fecha en timestamp (milisegundos)
+            timestamp = int(data.index[i].timestamp() * 1000)
+
+            # Guardar en el formato requerido: [timestamp, predicho, real]
+            resultados.append([
+                timestamp,
+                round(float(valor_predicho), 2),
+                round(float(y[i]), 2)
+            ])
 
         ultima_caracteristica = X_escalado[-1].reshape(1, -1)
         prediccion_extra_escalada = modelo.predict(ultima_caracteristica)
         prediccion_extra = escalador_y.inverse_transform(prediccion_extra_escalada.reshape(-1, 1))[0][0]
 
         fecha_prediccion_extra = data.index[-1] + timedelta(days=1)
+
     except Exception as e:
         return jsonify({
             "status": "ERROR",
