@@ -6,8 +6,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.linear_model import LinearRegression
 
 app = Flask(__name__)
-
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.route('/predict', methods=['GET'])
 def predict():
@@ -54,8 +53,7 @@ def predict():
         }), 500
 
     try:
-        valores_reales = []
-        valores_predichos = []
+        resultados = []
 
         for i in range(1, len(X_escalado)):
             X_train = X_escalado[:i]
@@ -67,8 +65,11 @@ def predict():
             valor_predicho_escalado = modelo.predict(X_escalado[i].reshape(1, -1))
             valor_predicho = escalador_y.inverse_transform(valor_predicho_escalado.reshape(-1, 1))[0][0]
 
-            valores_reales.append(float(y[i]))
-            valores_predichos.append(float(valor_predicho))
+            resultados.append({
+                "name": data.index[i].strftime('%Y-%m-%d'),
+                "real": round(float(y[i]), 2),
+                "predicho": round(float(valor_predicho), 2)
+            })
 
         ultima_caracteristica = X_escalado[-1].reshape(1, -1)
         prediccion_extra_escalada = modelo.predict(ultima_caracteristica)
@@ -86,8 +87,7 @@ def predict():
         "status": "OK",
         "msg": "Predicción realizada correctamente",
         "data": {
-            "valores_reales": valores_reales,
-            "valores_predichos": valores_predichos,
+            "resultados": resultados,
             "prediccion_adicional": {
                 "fecha": fecha_prediccion_extra.strftime('%Y-%m-%d'),
                 "valor": round(prediccion_extra, 2)
