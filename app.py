@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import yfinance as yf
 from datetime import datetime, timedelta
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.linear_model import LinearRegression
 
 app = Flask(__name__)
+
+CORS(app)
 
 @app.route('/predict', methods=['GET'])
 def predict():
